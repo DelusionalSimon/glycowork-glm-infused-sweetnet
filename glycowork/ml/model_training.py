@@ -104,7 +104,8 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
     best_lead_metric = float("inf")
 
     if mode == 'classification':
-        blank_metrics = {"loss": [], "acc": [], "mcc": [], "auroc": []}
+         # Removed auroc from metrics to avoid calculation issues for now
+        blank_metrics = {"loss": [], "acc": [], "mcc": []}
     elif mode == 'multilabel':
         blank_metrics = {"loss": [], "acc": [], "mcc": [], "lrap": [], "ndcg": []}
     else:
@@ -175,6 +176,7 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
                         pred2 = (pred_proba >= 0.5).astype(int)
                     running_metrics["acc"].append(accuracy_score(y_det.astype(int), pred2))
                     running_metrics["mcc"].append(matthews_corrcoef(y_det, pred2))
+                    # commented out auroc because it was throwing errors
                     #running_metrics["auroc"].append(roc_auc_score(y_det.astype(int), pred_proba if mode2 == 'binary' else pred_proba[:, 1]))
                 elif mode == 'multilabel':
                     pred_proba = sigmoid(pred_det)
