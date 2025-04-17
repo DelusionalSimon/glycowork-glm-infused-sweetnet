@@ -159,7 +159,12 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
                             optimizer.second_step(zero_grad = True)
                         else:
                             optimizer.step()
-
+                # Check for single-class batches
+                unique_classes = torch.unique(y).cpu().numpy()
+                if len(unique_classes) == 1:
+                    print(f"WARNING: Single-class batch detected in {phase} phase at epoch {epoch}!")
+                    print(f"Batch labels: {unique_classes}")
+                    
                 # Collecting relevant metrics
                 running_metrics["loss"].append(loss.item())
                 running_metrics["weights"].append(batch.max().cpu() + 1)
