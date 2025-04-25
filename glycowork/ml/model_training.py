@@ -94,6 +94,7 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
                mode: str = 'classification', # 'classification', 'multilabel', or 'regression'
                mode2: str = 'multi', # 'multi' or 'binary' classification
                return_metrics: bool = False, # whether to return metrics
+               use_external_embeddings: bool = False # whether to use external embeddings
               ) -> Union[torch.nn.Module, tuple[torch.nn.Module, dict[str, dict[str, list[float]]]]]: # best model from training and the training and validation metrics
     "trains a deep learning model on predicting glycan properties"
 
@@ -128,7 +129,12 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
 
             for data in dataloaders[phase]:
                 # Get all relevant node attributes
-                x, y, edge_index, batch = data.labels, data.y, data.edge_index, data.batch
+                print(f"Phase: {phase}, Data: {data}")
+                print(f"Phase: {phase}, Data.x: {getattr(data, 'x', None)}") # Check if x exists and its value
+                if use_external_embeddings:
+                    x, y, edge_index, batch = data.x.to(device), data.y.to(device), data.edge_index.to(device), data.batch.to(device)
+                else:
+                    x, y, edge_index, batch = data.labels.to(device), data.y.to(device), data.edge_index.to(device), data.batch.to(device)
                 prot = getattr(data, 'train_idx', None)
                 if prot is not None:
                     prot = prot.view(max(batch) + 1, -1).to(device)
@@ -160,12 +166,13 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
                             optimizer.second_step(zero_grad = True)
                         else:
                             optimizer.step()
+                
                 # Check for single-class batches
                 unique_classes = torch.unique(y).cpu().numpy()
                 if len(unique_classes) == 1:
                     print(f"WARNING: Single-class batch detected in {phase} phase at epoch {epoch}!")
                     print(f"Batch labels: {unique_classes}")
-                    
+
                 # Collecting relevant metrics
                 running_metrics["loss"].append(loss.item())
                 running_metrics["weights"].append(batch.max().cpu() + 1)
