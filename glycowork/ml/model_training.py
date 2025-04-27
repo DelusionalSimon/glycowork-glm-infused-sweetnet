@@ -129,8 +129,8 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
 
             for data in dataloaders[phase]:
                 # Get all relevant node attributes
-                print(f"Phase: {phase}, Data: {data}")
-                print(f"Phase: {phase}, Data.x: {getattr(data, 'x', None)}") # Check if x exists and its value
+                #print(f"Phase: {phase}, Data: {data}")
+                #print(f"Phase: {phase}, Data.x: {getattr(data, 'x', None)}") # Check if x exists and its value
                 if use_external_embeddings:
                     x, y, edge_index, batch = data.x.to(device), data.y.to(device), data.edge_index.to(device), data.batch.to(device)
                 else:
