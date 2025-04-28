@@ -132,9 +132,9 @@ def train_model(model: torch.nn.Module, # graph neural network for analyzing gly
                 #print(f"Phase: {phase}, Data: {data}")
                 #print(f"Phase: {phase}, Data.x: {getattr(data, 'x', None)}") # Check if x exists and its value
                 if use_external_embeddings:
-                    x, y, edge_index, batch = data.x.to(device), data.y.to(device), data.edge_index.to(device), data.batch.to(device)
+                    x, y, edge_index, batch = data.x, data.y, data.edge_index, data.batch
                 else:
-                    x, y, edge_index, batch = data.labels.to(device), data.y.to(device), data.edge_index.to(device), data.batch.to(device)
+                    x, y, edge_index, batch = data.labels, data.y, data.edge_index, data.batch
                 prot = getattr(data, 'train_idx', None)
                 if prot is not None:
                     prot = prot.view(max(batch) + 1, -1).to(device)
